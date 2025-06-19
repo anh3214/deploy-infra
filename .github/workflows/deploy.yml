@@ -1,0 +1,32 @@
+name: Deploy ERPNext to k3s
+
+on:
+  workflow_run:
+    workflows:
+      - "Build & Push ERPNext"
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    env:
+      SITE_DOMAIN: erp.customer1.vn
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      DBPASSWORD: ${{ secrets.DBPASSWORD }}
+
+    steps:
+      - name: Checkout infra repo
+        uses: actions/checkout@v3
+
+      - name: Generate values.yaml
+        run: |
+          echo "Creating values.yaml from template"
+          envsubst < values-template.yaml > values.yaml
+
+      - name: Helm upgrade/install
+        run: |
+          helm repo update
+          helm upgrade --install erp-site ./helm \
+            -n erp-site --create-namespace \
+            -f values.yaml

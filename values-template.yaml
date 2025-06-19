@@ -1,0 +1,26 @@
+images:
+  frappe:
+    repository: anh3214/frappe
+    tag: latest
+  erpnext:
+    repository: anh3214/erpnext
+    tag: latest
+
+apps:
+  - erpnext
+
+sites:
+  ${SITE_DOMAIN}:
+    adminPassword: ${ADMIN_PASSWORD}
+    dbRootPassword: ${DBPASSWORD}
+    installApps:
+      - erpnext
+
+ingress:
+  enabled: true
+  className: traefik
+  hosts:
+    - host: ${SITE_DOMAIN}
+      paths:
+        - path: /
+          pathType: Prefix
