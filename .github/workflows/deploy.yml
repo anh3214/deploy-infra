@@ -1,10 +1,8 @@
 name: Deploy ERPNext to k3s
 
 on:
-  workflow_run:
-    workflows:
-      - "Build & Push ERPNext"
-    types: [completed]
+  repository_dispatch:
+    types: [trigger-from-erpnext]
 
 jobs:
   deploy:
