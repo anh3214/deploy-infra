@@ -8,7 +8,7 @@ spec:
     namespace: customer-a
     server: https://kubernetes.default.svc
   source:
-    repoURL: https://github.com/your-org/DEPLOY-INFRA.git
+    repoURL: https://github.com/anh3214/deploy-infra.git
     targetRevision: HEAD
     path: helm/erpnext
     helm:
