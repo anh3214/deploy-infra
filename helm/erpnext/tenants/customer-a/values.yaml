@@ -1,11 +1,11 @@
 frappe:
   image:
-    repository: yourdocker/aifrappe
+    repository: erasmuspham/frappe
     tag: latest
 
 erpnext:
   image:
-    repository: yourdocker/aierp
+    repository: erasmuspham/erpnext
     tag: latest
 
 site:
