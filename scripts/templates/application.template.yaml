@@ -1,0 +1,24 @@
+# scripts/templates/application.template.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{CUSTOMER}}
+  namespace: argocd
+spec:
+  destination:
+    namespace: erp-{{CUSTOMER}}
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://github.com/anh3214/deploy-infra.git
+    targetRevision: main
+    path: helm/erpnext
+    helm:
+      valueFiles:
+        - ../../tenants/{{CUSTOMER}}/values.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

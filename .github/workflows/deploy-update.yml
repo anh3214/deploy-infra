@@ -1,0 +1,38 @@
+name: 🔁 Update ERPNext Tenant (Image only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      customer:
+        description: "Tên khách hàng (e.g. customer-a)"
+        required: true
+      tag:
+        description: "Tag image mới (e.g. customer-a-20250625)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update values.yaml (only tag)
+        run: |
+          chmod +x scripts/update-values.sh
+          ./scripts/update-values.sh \
+            "${{ github.event.inputs.customer }}" \
+            "${{ github.event.inputs.tag }}"
+
+      - name: Commit and Push updated values.yaml
+        run: |
+          git config user.name "ci-bot"
+          git config user.email "ci@example.com"
+          git add tenants/${{ github.event.inputs.customer }}/values.yaml
+          git commit -m "🔁 Update tenant: ${{ github.event.inputs.customer }} to tag: ${{ github.event.inputs.tag }}"
+          git push

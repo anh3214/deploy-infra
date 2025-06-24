@@ -1,0 +1,49 @@
+name: 🚀 Deploy New ERPNext Tenant
+
+on:
+  workflow_dispatch:
+    inputs:
+      customer:
+        description: "Tên khách hàng (e.g. customer-a)"
+        required: true
+      tag:
+        description: "Tag image đã build (e.g. customer-a-20250625)"
+        required: true
+      admin_password:
+        description: "Mật khẩu admin site"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate values.yaml
+        run: |
+          chmod +x scripts/generate-values.sh
+          ./scripts/generate-values.sh \
+            "${{ github.event.inputs.customer }}" \
+            "${{ github.event.inputs.tag }}" \
+            "${{ github.event.inputs.admin_password }}"
+
+      - name: Generate Argo CD Application YAML
+        run: |
+          chmod +x scripts/generate-application.sh
+          ./scripts/generate-application.sh \
+            "${{ github.event.inputs.customer }}"
+
+      - name: Commit and Push all config
+        run: |
+          git config user.name "ci-bot"
+          git config user.email "ci@example.com"
+          git add tenants/${{ github.event.inputs.customer }}/values.yaml
+          git add applications/${{ github.event.inputs.customer }}.yaml
+          git commit -m "🚀 Deploy tenant: ${{ github.event.inputs.customer }} with tag ${{ github.event.inputs.tag }}"
+          git push
