@@ -1,30 +1,36 @@
-name: Deploy ERPNext to k3s
+name: Manual Deploy ERPNext Site
 
 on:
-  repository_dispatch:
-    types: [trigger-from-erpnext]
+  workflow_dispatch:
+    inputs:
+      site_file:
+        description: "Tên file cấu hình trong folder sites/ (VD: customer1.yaml)"
+        required: true
+        default: customer1.yaml
 
 jobs:
   deploy:
     runs-on: self-hosted
 
-    env:
-      SITE_DOMAIN: erp.customer1.vn
-      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-      DBPASSWORD: ${{ secrets.DBPASSWORD }}
-
     steps:
-      - name: Checkout infra repo
+      - name: Checkout deploy-infra
         uses: actions/checkout@v3
 
-      - name: Generate values.yaml
+      - name: Triển khai site ERPNext
         run: |
-          echo "Creating values.yaml from template"
-          envsubst < values-template.yaml > values.yaml
+          SITE_FILE="${{ github.event.inputs.site_file }}"
+          SITE_NAME=$(basename "$SITE_FILE" .yaml)
 
-      - name: Helm upgrade/install
+          echo "Deploying: $SITE_NAME"
+
+          helm upgrade --install "$SITE_NAME" ./erpnext \
+            -n "$SITE_NAME" --create-namespace \
+            -f "sites/$SITE_FILE"
+
+      - name: Kiểm tra pod sau deploy
         run: |
-          helm repo update
-          helm upgrade --install erp-site ./helm \
-            -n erp-site --create-namespace \
-            -f values.yaml
+          SITE_FILE="${{ github.event.inputs.site_file }}"
+          SITE_NAME=$(basename "$SITE_FILE" .yaml)
+
+          kubectl get pods -n "$SITE_NAME"
+          kubectl get svc -n "$SITE_NAME"
