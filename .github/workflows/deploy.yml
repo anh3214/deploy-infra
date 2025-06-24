@@ -29,6 +29,6 @@ jobs:
         run: |
           git config user.name "ci-bot"
           git config user.email "ci@yourdomain.com"
-          git add tenants/${{ github.event.inputs.customer }}-values.yaml
+          git add tenants/${{ github.event.inputs.customer }}/values.yaml
           git commit -m "Deploy ${{ github.event.inputs.customer }} with tag ${{ github.event.inputs.tag }}"
           git push
