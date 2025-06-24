@@ -29,7 +29,6 @@ spec:
         resources:
           {{- toYaml .Values.jobs.configure.resources | nindent 10 }}
         securityContext:
-          # run as root to set ownership
           runAsUser: 0
         volumeMounts:
           - name: sites-dir
@@ -44,29 +43,21 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
-        {{- if .Values.jobs.configure.command }}
-          {{- toYaml .Values.jobs.configure.command | nindent 10 }}
-        {{- else }}
           - bash
           - -c
-        {{- end }}
         args:
-        {{- if .Values.jobs.configure.args }}
-          {{- toYaml .Values.jobs.configure.args | nindent 10 }}
-        {{- else }}
-          - >
+          - |
             ls -1 apps > sites/apps.txt;
             [[ -f sites/common_site_config.json ]] || echo "{}" > sites/common_site_config.json;
             bench set-config -gp db_port $DB_PORT;
             bench set-config -g db_host $DB_HOST;
             {{- if .Values.dbRds }}
             bench set-config -gp rds_db 1;
-            {{- end}}
+            {{- end }}
             bench set-config -g redis_cache $REDIS_CACHE;
             bench set-config -g redis_queue $REDIS_QUEUE;
             bench set-config -g redis_socketio $REDIS_QUEUE;
             bench set-config -gp socketio_port $SOCKETIO_PORT;
-        {{- end }}
         env:
           - name: DB_HOST
             {{- if .Values.mariadb.enabled }}
