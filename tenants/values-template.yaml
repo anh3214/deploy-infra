@@ -1,0 +1,30 @@
+frappe:
+  image:
+    repository: yourdocker/aifrappe
+    tag: {{TAG}}
+
+erpnext:
+  image:
+    repository: yourdocker/aierp
+    tag: {{TAG}}
+
+site:
+  name: {{CUSTOMER}}
+  adminPassword: {{ADMIN_PASSWORD}}
+  installApps: erpnext
+
+jobs:
+  createSite:
+    enabled: true
+    siteName: {{CUSTOMER}}
+    adminPassword: {{ADMIN_PASSWORD}}
+    installApps: erpnext
+
+imagePullSecrets:
+  - name: regcred
+
+persistence:
+  worker:
+    enabled: true
+nginx:
+  enabled: true

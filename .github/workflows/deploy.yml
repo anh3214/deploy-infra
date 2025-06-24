@@ -1,36 +1,34 @@
-name: Manual Deploy ERPNext Site
+name: Deploy ERPNext Tenant (Only)
 
 on:
   workflow_dispatch:
     inputs:
-      site_file:
-        description: "Tên file cấu hình trong folder sites/ (VD: customer1.yaml)"
+      customer:
+        description: "Tên khách hàng (e.g. customer-a)"
         required: true
-        default: customer1.yaml
+      tag:
+        description: "Tag image đã build sẵn"
+        required: true
+      admin_password:
+        description: "Mật khẩu admin site"
+        required: true
 
 jobs:
   deploy:
-    runs-on: self-hosted
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout deploy-infra
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Triển khai site ERPNext
+      - name: Generate values.yaml
         run: |
-          SITE_FILE="${{ github.event.inputs.site_file }}"
-          SITE_NAME=$(basename "$SITE_FILE" .yaml)
+          chmod +x scripts/generate-values.sh
+          ./scripts/generate-values.sh ${{ github.event.inputs.customer }} ${{ github.event.inputs.tag }} ${{ github.event.inputs.admin_password }}
 
-          echo "Deploying: $SITE_NAME"
-
-          helm upgrade --install "$SITE_NAME" ./erpnext \
-            -n "$SITE_NAME" --create-namespace \
-            -f "sites/$SITE_FILE"
-
-      - name: Kiểm tra pod sau deploy
+      - name: Commit & Push values.yaml
         run: |
-          SITE_FILE="${{ github.event.inputs.site_file }}"
-          SITE_NAME=$(basename "$SITE_FILE" .yaml)
-
-          kubectl get pods -n "$SITE_NAME"
-          kubectl get svc -n "$SITE_NAME"
+          git config user.name "ci-bot"
+          git config user.email "ci@yourdomain.com"
+          git add tenants/${{ github.event.inputs.customer }}-values.yaml
+          git commit -m "Deploy ${{ github.event.inputs.customer }} with tag ${{ github.event.inputs.tag }}"
+          git push

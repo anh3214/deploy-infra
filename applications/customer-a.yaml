@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: customer-a
+  namespace: argocd
+spec:
+  destination:
+    namespace: customer-a
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://github.com/your-org/DEPLOY-INFRA.git
+    targetRevision: HEAD
+    path: helm/erpnext
+    helm:
+      valueFiles:
+        - ../../tenants/customer-a-values.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
