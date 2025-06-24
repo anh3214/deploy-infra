@@ -4,8 +4,8 @@ CUSTOMER=$1
 TAG=$2
 ADMIN_PASSWORD=$3
 
-TEMPLATE="tenants/values-template.yaml"
-TARGET="tenants/$CUSTOMER/values.yaml"
+TEMPLATE="helm/erpnext/tenants/values-template.yaml"
+TARGET="helm/erpnext/tenants/$CUSTOMER/values.yaml"
 
 # Check input
 if [[ -z "$CUSTOMER" || -z "$TAG" || -z "$ADMIN_PASSWORD" ]]; then
@@ -14,7 +14,7 @@ if [[ -z "$CUSTOMER" || -z "$TAG" || -z "$ADMIN_PASSWORD" ]]; then
 fi
 
 # Create folder nếu chưa có
-mkdir -p "tenants/$CUSTOMER"
+mkdir -p "helm/erpnext/tenants/$CUSTOMER"
 
 # Generate values.yaml từ template dùng chung
 cp "$TEMPLATE" "$TARGET"
@@ -24,4 +24,4 @@ sed -i "s/{{TAG}}/$TAG/g" "$TARGET"
 sed -i "s/{{CUSTOMER}}/$CUSTOMER/g" "$TARGET"
 sed -i "s/{{ADMIN_PASSWORD}}/$ADMIN_PASSWORD/g" "$TARGET"
 
-echo "✅ Created tenants/$CUSTOMER/values.yaml"
+echo "✅ Created helm/erpnext/tenants/$CUSTOMER/values.yaml"
