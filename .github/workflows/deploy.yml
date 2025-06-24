@@ -13,12 +13,17 @@ on:
         description: "Mật khẩu admin site"
         required: true
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }} # Nếu repo là private, nên khai báo GH_TOKEN riêng
 
       - name: Generate values.yaml
         run: |
