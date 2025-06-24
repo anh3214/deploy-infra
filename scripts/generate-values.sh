@@ -4,7 +4,7 @@ CUSTOMER=$1
 TAG=$2
 ADMIN_PASSWORD=$3
 
-TEMPLATE="tenants/values.template.yaml"
+TEMPLATE="tenants/values-template.yaml"
 TARGET="tenants/$CUSTOMER/values.yaml"
 
 # Check input
