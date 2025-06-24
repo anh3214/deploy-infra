@@ -13,7 +13,7 @@ spec:
     path: helm/erpnext
     helm:
       valueFiles:
-        - ../../tenants/customer-a-values.yaml
+        - ../../tenants/customer-a/values.yaml
   syncPolicy:
     automated:
       prune: true
